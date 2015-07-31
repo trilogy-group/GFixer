@@ -1,3 +1,6 @@
+/*
+* This particular .java class is free of known copyright restrictions.
+*/
 package com.tylerhyperHD.GFixer;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
