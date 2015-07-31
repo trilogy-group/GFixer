@@ -1,0 +1,6 @@
+name: GFixer
+main: com.tylerhyperHD.GFixer.GFixer
+version: 1.0
+description: Fixes a ton of minecraft bugs for server owners.
+softdepend: [WorldEdit, Essentials]
+authors: [tylerhyperHD]
