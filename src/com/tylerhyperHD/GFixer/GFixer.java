@@ -19,11 +19,11 @@ package com.tylerhyperHD.GFixer;
 import com.tylerhyperHD.GFixer.Commands.GFixerCommand;
 import com.tylerhyperHD.GFixer.Listeners.GListen;
 import java.io.File;
+import org.bukkit.ChatColor;
 import org.bukkit.Server;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -47,18 +47,18 @@ public class GFixer extends JavaPlugin {
     
     @Override
     public void onEnable() {
-        Loggers.info("Loading GFixer by tylerhyperHD");
+        Loggers.info(ChatColor.RED + "Loading GFixer by tylerhyperHD");
         configs = new GFixerConfigs();
         final PluginManager pm = server.getPluginManager();
         pm.registerEvents(new GListen(), plugin);
         configs = GFixer.configs;
-        Loggers.info("GFixer by tylerhyperHD has been enabled!");
+        Loggers.info(ChatColor.RED + "GFixer by tylerhyperHD has been enabled!");
     }
     
     @Override
     public void onDisable() {
         server.getScheduler().cancelTasks(plugin);
-        Loggers.info("GFixer by tylerhyperHD has been disabled!");
+        Loggers.info(ChatColor.RED + "GFixer by tylerhyperHD has been disabled!");
     }
     
     
@@ -66,6 +66,11 @@ public class GFixer extends JavaPlugin {
     public boolean onCommand(CommandSender commandSender, Command command, String label, String[] args) {
         if(label.equalsIgnoreCase("gfixer")) {
             GFixerCommand.process(commandSender, args);
+        }
+        else if(label.replaceAll("/", "").split(" ")[0].equalsIgnoreCase("regen")) {
+            if (GFixer.configs.getMainConfig().getConfig().getBoolean("regen-disabled")) {
+                GFixerCommand.regenCommand(commandSender, args);
+            }
         }
         return false;
     }

@@ -28,9 +28,14 @@ public class GFixerCommand {
     private GFixerCommand() {}
     
     public static boolean process(CommandSender sender, String[] args) {
-            Plugin plugin = GFixer.getInstance();
-            sender.sendMessage(ChatColor.RED + "GFixer was made to resolve bugs in minecraft for server owners.");
-            sender.sendMessage(ChatColor.RED + "Made by tylerhyperHD");
+        Plugin plugin = GFixer.getInstance();
+        sender.sendMessage(ChatColor.RED + "GFixer was made to resolve bugs in minecraft for server owners.");
+        sender.sendMessage(ChatColor.RED + "Made by tylerhyperHD");
+        return true;
+    }
+    public static boolean regenCommand(CommandSender sender, String[] args) {
+        Plugin plugin = GFixer.getInstance();
+        sender.sendMessage(ChatColor.RED + "Regen command has been disabled in the WorldEdit config.");
         return true;
     }
 }

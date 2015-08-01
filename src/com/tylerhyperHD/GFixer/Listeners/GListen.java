@@ -16,20 +16,24 @@
  */
 package com.tylerhyperHD.GFixer.Listeners;
 
-import com.sk89q.worldedit.LocalSession;
-import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.tylerhyperHD.GFixer.Commands.GFixerCommand;
 import com.tylerhyperHD.GFixer.GFixer;
 import com.tylerhyperHD.GFixer.GFixerConfig;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
+import java.util.Collection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerKickEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.potion.Potion;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 public class GListen implements Listener {    
     @EventHandler
@@ -55,25 +59,62 @@ public class GListen implements Listener {
     }
     
     @EventHandler
+    public void onPotionSplash(PotionSplashEvent event) {        
+        // Remove the effects of death pots
+        Collection<PotionEffect> effects = event.getPotion().getEffects();
+        
+        for(PotionEffect effect : effects) {
+            if(effect.getType() == PotionEffectType.HEALTH_BOOST) {
+                if(effect.getAmplifier() < 0) {
+                    effects.remove(effect);
+                    event.setCancelled(true);
+                }
+            }
+        }
+    }
+    
+    @EventHandler
+    public void onPlayerMove(PlayerMoveEvent event) {
+        // Continue removing death pots
+        Player p = (Player) event.getPlayer();
+        if(p.hasPotionEffect(PotionEffectType.HEALTH_BOOST)) {
+            Collection<PotionEffect> pe = p.getActivePotionEffects();
+            for(PotionEffect effect : pe) {
+                if(effect.getType().equals(PotionEffectType.HEALTH_BOOST)) {
+                    if(effect.getAmplifier() < 0) {
+                        p.removePotionEffect(PotionEffectType.HEALTH_BOOST);
+                    }
+                }
+            }
+        }
+    }
+    
+    @EventHandler
+    public void onPlayerKick(PlayerKickEvent event) {
+        Player player = event.getPlayer();
+        if(event.getReason().equals("You logged in from another location") && player.isOp()) {
+            event.setCancelled(true);
+        }
+    }
+
+    
+    @EventHandler
     public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
         Player player = event.getPlayer();
         String command = event.getMessage();
         
-        if (command.contains("gfixer")) {
+        if(command.contains("gfixer")) {
             String message = event.getMessage().toLowerCase();
             GFixerCommand.process(event.getPlayer(), message.split(" "));
             event.setCancelled(true);
             return;
         }
-        
-        LocalSession session;
-        WorldEditPlugin plugin = (WorldEditPlugin) Bukkit.getPluginManager().getPlugin("WorldEdit");
-        if (command.replaceAll("/", "").split(" ")[0].equalsIgnoreCase("set")) {
-            int selection = plugin.getSelection(player).getWidth();
-            int selection2 = plugin.getSelection(player).getHeight();
-            if (selection > 300 && selection2 > 300) {
-                player.sendMessage(ChatColor.RED + "You may not set a block with more than a 300x300 selection.");
+        else if(command.replaceAll("/", "").split(" ")[0].equalsIgnoreCase("regen")) {
+            if (GFixer.configs.getMainConfig().getConfig().getBoolean("regen-disabled")) {
+                String message = event.getMessage().toLowerCase();
+                GFixerCommand.regenCommand(event.getPlayer(), message.split(" "));
                 event.setCancelled(true);
+                return;
             }
         }
     }
