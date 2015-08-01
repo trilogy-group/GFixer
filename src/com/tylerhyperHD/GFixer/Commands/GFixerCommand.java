@@ -1,9 +1,10 @@
 package com.tylerhyperHD.GFixer.Commands;
 
+import com.tylerhyperHD.GFixer.GFixer;
 import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 /*
  * Copyright (C) 2015 tylerhyperHD
@@ -22,12 +23,14 @@ import org.bukkit.command.CommandSender;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-public class GFixerCommand implements CommandExecutor {
-
-    @Override
-    public boolean onCommand(CommandSender sender, Command cmnd, String string, String[] strings) {
-        sender.sendMessage(ChatColor.RED + "GFixer was made to resolve bugs in minecraft for server owners.");
-        sender.sendMessage(ChatColor.RED + "Made by tylerhyperHD");
+public class GFixerCommand {
+    
+    private GFixerCommand() {}
+    
+    public static boolean process(CommandSender sender, String[] args) {
+            Plugin plugin = GFixer.getInstance();
+            sender.sendMessage(ChatColor.RED + "GFixer was made to resolve bugs in minecraft for server owners.");
+            sender.sendMessage(ChatColor.RED + "Made by tylerhyperHD");
         return true;
     }
 }

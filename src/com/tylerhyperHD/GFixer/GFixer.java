@@ -20,7 +20,11 @@ import com.tylerhyperHD.GFixer.Commands.GFixerCommand;
 import com.tylerhyperHD.GFixer.Listeners.GListen;
 import java.io.File;
 import org.bukkit.Server;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -29,25 +33,25 @@ public class GFixer extends JavaPlugin {
     public static GFixer plugin;
     public static Server server;
     public static Loggers logger;
-    public static GFixerConfigs config;
+    public static GFixerConfigs configs;
     //
     private File configFile;
     private FileConfiguration fileConfiguration;
+    private static Plugin instance;
     
     @Override
     public void onLoad() {
-        GFixer.plugin = this;
+        plugin = this;
+        GFixer.server = plugin.getServer();
     }
     
     @Override
     public void onEnable() {
+        Loggers.info("Loading GFixer by tylerhyperHD");
+        configs = new GFixerConfigs();
         final PluginManager pm = server.getPluginManager();
         pm.registerEvents(new GListen(), plugin);
-        plugin.getConfig().options().copyDefaults(true);
-        plugin.saveDefaultConfig();
-        plugin.getConfig().set("chat-cooldown", true);
-        plugin.saveConfig();
-        getCommand("gfixer").setExecutor(new GFixerCommand());
+        configs = GFixer.configs;
         Loggers.info("GFixer by tylerhyperHD has been enabled!");
     }
     
@@ -55,6 +59,19 @@ public class GFixer extends JavaPlugin {
     public void onDisable() {
         server.getScheduler().cancelTasks(plugin);
         Loggers.info("GFixer by tylerhyperHD has been disabled!");
+    }
+    
+    
+    @Override
+    public boolean onCommand(CommandSender commandSender, Command command, String label, String[] args) {
+        if(label.equalsIgnoreCase("gfixer")) {
+            GFixerCommand.process(commandSender, args);
+        }
+        return false;
+    }
+    
+    public static Plugin getInstance() {
+        return instance;
     }
     
     public FileConfiguration getConfig() {

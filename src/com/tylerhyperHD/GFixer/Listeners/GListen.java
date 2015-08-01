@@ -18,7 +18,7 @@ package com.tylerhyperHD.GFixer.Listeners;
 
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
-import com.sk89q.worldedit.command.RegionCommands;
+import com.tylerhyperHD.GFixer.Commands.GFixerCommand;
 import com.tylerhyperHD.GFixer.GFixer;
 import com.tylerhyperHD.GFixer.GFixerConfig;
 import org.bukkit.Bukkit;
@@ -27,19 +27,15 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
-public class GListen implements Listener {
-    
-    public GFixer plugin;
-    
+public class GListen implements Listener {    
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        GFixerConfig playerfetch = GFixer.config.getPlayers();
+        GFixerConfig playerfetch = GFixer.configs.getPlayers();
         FileConfiguration config = playerfetch.getConfig();
         config.set(player.getUniqueId().toString() + ".lastLoginTime", System.currentTimeMillis());
         config.set(player.getUniqueId().toString() + ".lastUsername", player.getName());
@@ -63,6 +59,13 @@ public class GListen implements Listener {
         Player player = event.getPlayer();
         String command = event.getMessage();
         
+        if (command.contains("gfixer")) {
+            String message = event.getMessage().toLowerCase();
+            GFixerCommand.process(event.getPlayer(), message.split(" "));
+            event.setCancelled(true);
+            return;
+        }
+        
         LocalSession session;
         WorldEditPlugin plugin = (WorldEditPlugin) Bukkit.getPluginManager().getPlugin("WorldEdit");
         if (command.replaceAll("/", "").split(" ")[0].equalsIgnoreCase("set")) {
@@ -73,16 +76,5 @@ public class GListen implements Listener {
                 event.setCancelled(true);
             }
         }
-    }
-    
-    @EventHandler
-    public void onSynchronizedPlayerChat(AsyncPlayerChatEvent event) {
-        Player player = event.getPlayer();
-        String message = event.getMessage();
-                
-        if(plugin.getConfig().getBoolean("chat-cooldown", true)) {
-            // Not implemented into the config yet
-        }
-        event.setMessage(message);
     }
 }
